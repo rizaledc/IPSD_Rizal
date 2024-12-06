@@ -73,7 +73,7 @@ def main():
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': train_loss_avg,
-            }, f"./SimpleCNN_{epoch + 1}.pt")
+            }, f"./ModelsCNN_{epoch + 1}.pt")
 
     plt.plot(range(EPOCH), loss_train_all, color="red", label='Training')
     plt.plot(range(EPOCH), loss_vali_all, color="green", label='Validation')
