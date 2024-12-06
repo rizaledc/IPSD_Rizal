@@ -13,7 +13,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 from sklearn.preprocessing import label_binarize
 
 def main():
-    BATCH_SIZE = 25
+    BATCH_SIZE = 32
     LEARNING_RATE = 0.001
     folds = [1,2,3,4,5]
     DEVICE = 'cuda'
@@ -25,7 +25,7 @@ def main():
     loss_function = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=LEARNING_RATE)
 
-    checkpoint = torch.load('SimpleCNN_15.pt')
+    checkpoint = torch.load('ModelsCNN_25.pt')
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
