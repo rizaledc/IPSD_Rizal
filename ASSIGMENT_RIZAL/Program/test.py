@@ -5,7 +5,7 @@ import seaborn as sn
 import pandas as pd
 import numpy as np
 
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 from torch.optim import Adam
 from Utils.getData import getImageLabel
 from Model.CNN import SimpleCNN
@@ -15,17 +15,25 @@ from sklearn.preprocessing import label_binarize
 def main():
     BATCH_SIZE = 32
     LEARNING_RATE = 0.001
-    folds = [1,2,3,4,5]
+    folds = [1, 2, 3, 4, 5]
     DEVICE = 'cuda'
 
-    test_loader = DataLoader(getImageLabel(original=f'C:/Bismillah/Data/Original Images/Original Images/FOLDS/', folds=folds, subdir=['Test']), batch_size=BATCH_SIZE, shuffle=True)
+    # Membuat dataset untuk test dan valid
+    test_dataset = getImageLabel(original=f'C:/Bismillah/Data/Original Images/Original Images/FOLDS/', folds=folds, subdir=['Test'])
+    valid_dataset = getImageLabel(original=f'C:/Bismillah/Data/Original Images/Original Images/FOLDS/', folds=folds, subdir=['Valid'])
+
+    # Menggabungkan dataset
+    combined_dataset = ConcatDataset([test_dataset, valid_dataset])
+
+    # Membuat DataLoader dari dataset yang digabungkan
+    combined_loader = DataLoader(combined_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     model = SimpleCNN(input_dim=32, input_c=3, output=6, device=DEVICE)
     model.to(DEVICE)
     loss_function = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=LEARNING_RATE)
 
-    checkpoint = torch.load('ModelsCNN_25.pt')
+    checkpoint = torch.load('ModelsCNN_25.pt', weights_only=True)  # Update to use weights_only=True
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
@@ -34,13 +42,14 @@ def main():
     prediction, ground_truth, probabilities = [], [], []
     with torch.no_grad():
         model.eval()
-        for batch, (src, trg) in enumerate(test_loader):
-            src = torch.permute(src, (0, 3, 1, 2))
+        for batch, (src, trg) in enumerate(combined_loader):  # Menggunakan combined_loader
+            src = torch.permute(src, (0, 3, 1, 2)).to(DEVICE)  # Move src to the correct device
+            trg = trg.to(DEVICE)  # Ensure trg is also on the correct device
 
             pred = model(src)
-            probabilities.extend(pred.detach().numpy())
-            prediction.extend(torch.argmax(pred,dim=1).detach().numpy())
-            ground_truth.extend(torch.argmax(trg, dim=1).detach().numpy())
+            probabilities.extend(pred.detach().cpu().numpy())  # Move to CPU for numpy conversion
+            prediction.extend(torch.argmax(pred, dim=1).detach().cpu().numpy())  # Move to CPU
+            ground_truth.extend(torch.argmax(trg, dim=1).detach().cpu().numpy())  # Move to CPU
 
     classes = ('Chikenpox', 'Cowpox', 'Healty', 'HFMD', 'Measles', 'Monkeypox')
 
