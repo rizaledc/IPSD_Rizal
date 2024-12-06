@@ -61,7 +61,7 @@ def main():
     probabilities = np.array(probabilities)
 
     plt.figure(figsize=(10, 8))
-    colors = ['red', 'orange', 'blue', 'green', 'yellow', 'purple']
+    colors = ['green', 'orange', 'red', 'pink', 'black', 'purple']
     for i, class_name in enumerate(classes):
         fpr, tpr, _ = roc_curve(ground_truth_bin[:, i], probabilities[:, i])
         roc_auc = auc(fpr, tpr)
@@ -73,7 +73,7 @@ def main():
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.legend(loc="lower right")
-    plt.savefig('roc_auc.png')
+    plt.savefig('AUC.png')
 
 if __name__ == "__main__":
     main()
