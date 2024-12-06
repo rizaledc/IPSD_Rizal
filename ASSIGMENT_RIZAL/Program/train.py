@@ -8,8 +8,8 @@ from torch.optim import Adam
 from Model.CNN import SimpleCNN
 
 def main():
-    BATCH_SIZE = 64
-    EPOCH = 15
+    BATCH_SIZE = 32
+    EPOCH = 25
     LEARNING_RATE = 0.001
     folds = [1, 2, 3, 4, 5]
     DEVICE = 'cuda'
@@ -67,7 +67,7 @@ def main():
         loss_vali_all.append(vali_loss_avg)
 
         print(f"Epoch {epoch + 1}, Train Loss: {train_loss_avg:.4f}, Validation Loss: {vali_loss_avg:.4f}")
-        if (epoch + 1) % 15 == 0:
+        if (epoch + 1) % 25 == 0:
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
