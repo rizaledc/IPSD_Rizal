@@ -13,7 +13,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 from sklearn.preprocessing import label_binarize
 
 def main():
-    BATCH_SIZE = 32
+    BATCH_SIZE = 25
     LEARNING_RATE = 0.001
     folds = [1,2,3,4,5]
     DEVICE = 'cuda'
